@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.QuestionMapper">
+	
+	<sql id="whereSql" >
+		<if test="question.content != null and question.content != ''">
+			<![CDATA[and q.content like '%'+#{question.content}+'%']]>
+		</if>
+		<if test="question.netWorkCourse!=null and question.netWorkCourse.nwId>0">
+			<![CDATA[and n.nwId = #{question.netWorkCourse.nwId}]]>
+		</if>
+		<if test="question.questionIds!=null">
+			and questionID in 
+			<foreach collection="question.questionIds" item="questionId" separator="," open="(" close=")">
+				#{questionId}
+			</foreach>
+		</if>
+	</sql>
+
+	<select id="getQuestionsByPage" parameterType="HashMap" resultMap="questionResultMap">
+		select * from 	
+		(
+			select ROW_NUMBER() OVER(order by content desc )as tid,
+			q.questionID,q.content,score,q.createTime,q.nwId,q.title,q.description
+			from t_cb_questions q,t_cb_netWorkCourse n
+			where q.nwId = n.nwId
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getQuestionCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from t_cb_questions q,t_cb_netWorkCourse n where q.nwId = n.nwId
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveQuestion" parameterType="Question" >
+		insert into T_CB_QUESTIONS (content,nwId,score,createTime,description) 
+		values (#{content},#{netWorkCourse.nwId},#{score},getdate(),#{description})
+	</insert>
+	
+	<delete id="deleteQuestion" parameterType="Question">
+		delete from T_CB_QUESTIONS where questionId = #{questionId}
+	</delete>
+	
+	<update id="updateQuestion" parameterType="Question">
+		update T_CB_QUESTIONS  
+			set content = #{content} ,nwId = #{netWorkCourse.nwId}, score = #{score}
+			<if test="description != null and description !=''">
+			,description = #{description}
+			</if>
+		where questionId = #{questionId}
+	</update>
+	
+	<delete id="batchDeleteQuestion" parameterType="int[]">
+		delete from T_CB_QUESTIONS where questionId in
+		<foreach collection="questionArr" open="(" close=")" item="question" separator=",">
+			#{question}
+		</foreach>
+	</delete>
+	
+	<select id="getQuestionById" parameterType="Integer" resultMap="questionResultMap">
+		select * from t_cb_questions  where questionID = #{questionId}
+	</select>
+	
+	<select id="getQuestionInQuestionId" parameterType="Integer[]" resultMap="questionResultMap2">
+		select * from t_cb_questions 
+			where questionID in 
+			<foreach collection="questionIdArr" item="questionId" separator="," open="(" close=")">
+				#{questionId}
+			</foreach>
+	</select>
+</mapper>

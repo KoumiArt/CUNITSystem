@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.SubjectMapper">
+	<resultMap type="Subject" id="subjectResultMap">
+		<id property="subjectId" column="subjectId" />
+		<result property="subjectName" column="subjectName"/>
+		<result property="createTime" column="createTime"/>
+	</resultMap>
+</mapper>

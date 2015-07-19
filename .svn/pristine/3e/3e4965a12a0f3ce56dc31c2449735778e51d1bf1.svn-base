@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.NetWorkCourseMapper">
+	
+	<sql id="whereSql" >
+		<if test="netWorkCourse.courseName!=null and netWorkCourse.courseName!=''">
+			<![CDATA[and courseName like '%'+#{netWorkCourse.courseName}+'%']]>
+		</if>
+	</sql>
+
+	<select id="getNetWorkCoursesByPage" parameterType="HashMap" resultMap="netWorkCourseResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,*,
+				isNUll((select count(*) from T_CB_ENROL e where e.nwId = n.nwId and fkId = #{fkId}) ,0) as curUserIsEnrol 
+			from T_CB_NETWORKCOURSE n
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getNetWorkCoursesByList" parameterType="HashMap" resultMap="netWorkCourseResultMap">
+		select * from T_CB_NETWORKCOURSE 
+	</select>
+	
+	<select id="getNetWorkCourseCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_NETWORKCOURSE where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveNetWorkCourse" parameterType="NetWorkCourse" >
+		insert into T_CB_NETWORKCOURSE (courseName,createTime,description)
+		values (#{courseName},getdate(),#{description})
+	</insert>
+	
+	<delete id="deleteNetWorkCourse" parameterType="NetWorkCourse">
+		delete from T_CB_NETWORKCOURSE where nwId = #{nwId} 
+	</delete>
+	
+	<update id="updateNetWorkCourse" parameterType="NetWorkCourse">
+		update T_CB_NETWORKCOURSE  set courseName=#{courseName}, description = #{description}
+		where nwId = #{nwId} 
+	</update>
+	
+	<delete id="batchDeleteNetWorkCourse" parameterType="int[]">
+		delete from T_CB_NETWORKCOURSE where nwId in
+		<foreach collection="netWorkCourseArr" open="(" close=")" item="netWorkCourse" separator=",">
+			#{netWorkCourse}
+		</foreach>
+	</delete>
+	
+	<select id="getNetWorkCourseById" parameterType="Integer" resultMap="netWorkCourseResultMap">
+		select * from T_CB_NETWORKCOURSE where nwId = #{nwId} 
+	</select>
+</mapper>

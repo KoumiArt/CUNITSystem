@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.StuExamMapper">
+
+	<insert id="saveStuExam" parameterType="StuExam" >
+		insert into T_CB_STU_EXAM (examId,stuId,optionId,nwId,score)
+		values (#{examId},#{stuId},#{optionId},#{nwId},
+			ISNULL(
+				(
+					SELECT score FROM T_CB_QUESTIONS where  questionId in (
+						SELECT questionId from T_CB_OPTIONS  where Correct = 1 and  optionId = #{optionId})
+				), 
+			0)
+		)
+	</insert>
+
+	<select id="queryExitEaxm" parameterType="java.util.HashMap" resultType="int">
+		<![CDATA[
+			SELECT count(*) FROM T_CB_STU_EXAM se WHERE nwId =#{nwId} and stuId = #{stuId}
+			and examId = (
+					SELECT
+						examId
+					FROM
+						T_CB_EXAM e
+					WHERE
+						se.examId = e.examId and endDate >GETDATE()
+			)
+
+		]]>
+	</select>
+	<select id="queryExamId" parameterType="java.util.HashMap" resultType="Integer">
+		<![CDATA[
+			SELECT examId FROM T_CB_EXAM_QUESTION e_q
+			where questionId = 
+			( SELECT questionId FROM T_CB_OPTIONS where optionId = #{optionId})
+			and 
+			examId = (
+					SELECT
+						examId
+					FROM
+						T_CB_EXAM e
+					WHERE
+						e_q.examId = e.examId and endDate >GETDATE()
+			)
+		]]>
+	</select>
+	
+	<select id="queryExamResult" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+			SELECT s.sName as stuName ,
+				ISNULL((SELECT SUM(score) FROM
+					T_CB_STU_EXAM e where e.stuId = s.userId  and e.examId = #{examId}), 0)
+				 as totalScore
+				FROM
+				(
+				SELECT sName,(SELECT userId FROM T_CB_USERINFO where fkId = sid) as userId from T_CB_STUDENT where sid in (
+					SELECT fkId FROM T_CB_USERINFO where userId in (
+						select  fkId from T_CB_ENROL where type =1 and nwId = #{nwId}
+					)
+				)
+			) s 
+	</select>
+</mapper>

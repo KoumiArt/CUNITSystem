@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.SubjectMapper">
+	
+	<sql id="whereSql" >
+		<if test="subject.subjectName!=null and subject.subjectName!=''">
+			<![CDATA[and subjectName like '%'+#{subject.subjectName}+'%']]>
+		</if>	
+	</sql>
+
+	<select id="getSubjectsByPage" parameterType="HashMap" resultMap="subjectResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,* from T_CB_SUBJECT 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getSubjectsByList" parameterType="HashMap" resultMap="subjectResultMap">
+		select * from T_CB_SUBJECT 
+	</select>
+	
+	<select id="getSubjectCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_SUBJECT where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveSubject" parameterType="Subject" >
+		insert into T_CB_SUBJECT (subjectName,createTime) 
+		values (#{subjectName},getdate())
+	</insert>
+	
+	<delete id="deleteSubject" parameterType="Subject">
+		delete from T_CB_SUBJECT where subjectId = #{subjectId} 
+	</delete>
+	
+	<update id="updateSubject" parameterType="Subject">
+		update T_CB_SUBJECT  set subjectName = #{subjectName}
+		where subjectId = #{subjectId} 
+	</update>
+	
+	<delete id="batchDeleteSubject" parameterType="int[]">
+		delete from T_CB_SUBJECT where subjectId in
+		<foreach collection="subjectArr" open="(" close=")" item="subject" separator=",">
+			#{subject}
+		</foreach>
+	</delete>
+	
+	<select id="getSubjectById" parameterType="Integer" resultMap="subjectResultMap">
+		select * from T_CB_SUBJECT where subjectId = #{subjectId} 
+	</select>
+</mapper>

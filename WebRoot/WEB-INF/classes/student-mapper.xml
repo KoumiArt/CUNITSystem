@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.StudentMapper">
+	
+	<sql id="whereSql" >
+		<if test="student.sName!=null and student.sName!=''">
+			<![CDATA[and sName like '%'+#{student.sName}+'%']]>
+		</if>
+		<if test="student.grade!=null and student.grade.gradeId >0">
+			<![CDATA[and gradeid =#{student.grade.gradeId}]]>
+		</if>
+		<if test="student.sex>0">
+			<![CDATA[and sex =#{student.sex}]]>
+		</if>
+		<if test="student.sNo>0">
+			<![CDATA[and sNo =#{student.sNo}]]>
+		</if>	
+	</sql>
+
+	<select id="getStudentsByPage" parameterType="HashMap" resultMap="studentResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,* from T_CB_STUDENT 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getStudentCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_STUDENT where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveStudent" parameterType="Student" >
+		insert into T_CB_STUDENT (sName,sex,email,phone,address,age,sNo,createTime,gradeId) 
+		values (#{sName},#{sex},#{email},#{phone},#{address},#{age},#{sNo},getdate(),#{grade.gradeId})
+	</insert>
+	
+	<delete id="deleteStudent" parameterType="Student">
+		delete from T_CB_STUDENT where sId = #{sId} 
+	</delete>
+	
+	<update id="updateStudent" parameterType="Student">
+		update T_CB_STUDENT  set sName = #{sName} ,sex = #{sex}  ,
+								 email = #{email},phone = #{phone} ,
+								 address = #{address} ,age = #{age},
+								 sNo = #{sNo} 
+		where sId = #{sId} 
+	</update>
+	
+	<delete id="batchDeleteStudent" parameterType="int[]">
+		delete from T_CB_STUDENT where sId in
+		<foreach collection="studentArr" open="(" close=")" item="student" separator=",">
+			#{student}
+		</foreach>
+	</delete>
+	
+	<select id="getStudentById" parameterType="Integer" resultMap="studentResultMap">
+		select * from T_CB_STUDENT where sId = #{sId} 
+	</select>
+	
+	<select id="getStudentByUserSessionId" parameterType="String" resultType="Integer">
+		select sid from T_CB_STUDENT where sNo = #{userSessionId} 
+	</select>
+	
+	<select id="selectStuExam" parameterType="HashMap" resultType="HashMap">
+		SELECT * ,
+		(
+			SELECT SUM(score) FROM T_CB_STU_EXAM se where se.stuId = 
+			(
+				select userId from T_CB_USERINFO where fkId = #{stuId} and userType =2
+			 )
+			 and se.examId = e.examId
+		) as score , (select CourseName from T_CB_NETWORKCOURSE where nwId = e.nwId) as CourseName,
+		(select tName from  T_CB_TEACHER where tId = 
+			(
+				select fkId from T_CB_USERINFO where userId = 
+					(select fkId from T_CB_ENROL where type = 2 and nwId = e.nwId)
+			) 
+		) as  tName 
+		FROM T_CB_EXAM e where e.examId in 
+		(
+			SELECT examId FROM T_CB_STU_EXAM where stuId =
+			(
+				select userId from T_CB_USERINFO where fkId = #{stuId} and userType =2
+			)
+		) 
+		<if test="nwId>0">
+			and nwId = #{nwId}
+		</if>
+	</select>
+</mapper>

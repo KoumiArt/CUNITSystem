@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.ExamQuestionMapper">
+	<resultMap type="ExamQuestion" id="examQuestionResultMap">
+		<id property="eqId" column="eqId" />
+		<result property="examId" column="examId"/>
+		<result property="quesitonId" column="quesitonId" />
+		<result property="nwId" column="nwId" />
+	</resultMap>
+</mapper>

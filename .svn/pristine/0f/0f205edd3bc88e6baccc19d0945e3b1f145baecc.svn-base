@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.UserMapper">
+
+	<select id="login" resultType="UserInfo" resultMap="userInfoResultMap">
+		select * from T_CB_USERINFO where loginName =#{loginName} and loginPwd
+		=#{loginPwd}
+	</select>
+
+	<select id="getUserInfoById" parameterType="Integer" resultType="UserInfo">
+		 select userId,loginName,s.sid as 'student.sId' ,s.sName as 'student.sName',s.createTime as 'student.createTime',s.sex as 'student.sex',
+		 	t.tName as 'teacher.tName',t.createTime as 'teacher.createTime',t.sex as 'teacher.sex'
+			from T_CB_USERINFO u LEFT JOIN T_CB_STUDENT s
+			 on  (u.fkId = s.sid and u.userType =2)
+			 LEFT JOIN T_CB_TEACHER t 
+			 on (u.fkId = t.tid and u.userType =3)
+			 where userId = #{userId} 
+	</select>
+	
+	<select id="checkLoginName" parameterType="String" resultType="String">
+		 select loginName from T_CB_USERINFO where loginName = #{loginName} 
+	</select>
+	
+	<select id="getStudentNo" parameterType="String" resultType="String">
+		 select sNo from T_CB_STUDENT where sNo = #{uNo} 
+	</select>
+	
+	<select id="getTearchNo" parameterType="String" resultType="String">
+		 select tNo from T_CB_TEACHER where tNo = #{uNo} 
+	</select>
+	
+	<insert id="register" parameterType="UserInfo" >
+		insert into T_CB_USERINFO (loginName,loginPwd,fkId,userType) 
+		values (#{loginName},#{loginPwd},#{fkId},#{userType})
+	</insert>
+	
+	<update id="updatePwd" parameterType="UserInfo">
+		update T_CB_USERINFO set loginPwd = #{loginPwd} where loginName = #{loginName}
+	</update>
+	
+	<select id="checkOldLoginPwd" parameterType="String" resultType="String">
+		select loginPwd from T_CB_USERINFO where loginName = #{loginName} 
+	</select>
+</mapper>

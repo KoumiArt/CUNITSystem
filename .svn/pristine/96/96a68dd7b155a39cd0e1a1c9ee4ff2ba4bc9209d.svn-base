@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.OptionMapper">
+	
+	<sql id="whereSql" >
+		<if test="option.content!=null and option.content!=''">
+			<![CDATA[and content like '%'+#{option.content}+'%']]>
+		</if>
+		<if test="option.question!=null and option.question.questionId >0">
+			<![CDATA[and questionId = #{option.question.questionId}]]>
+		</if>		
+	</sql>
+
+	<select id="getOptionsByPage" parameterType="HashMap" resultMap="optionResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,* from T_CB_OPTIONS 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getOptionCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_OPTIONS where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveOption" parameterType="Option" >
+		insert into T_CB_OPTIONS (oName,content,questionId,correct,createTime) 
+		values (#{oName},#{content},#{question.questionId},#{correct},getdate())
+	</insert>
+	
+	<delete id="deleteOption" parameterType="Option">
+		delete from T_CB_OPTIONS where optionId = #{optionId} 
+	</delete>
+	
+	<update id="updateOption" parameterType="Option">
+		update T_CB_OPTIONS  set content = #{content} ,
+		questionId = #{question.questionId}, 
+		correct = #{correct},
+		oName = #{oName}
+		where optionId = #{optionId} 
+	</update>
+	
+	<delete id="batchDeleteOption" parameterType="int[]">
+		delete from T_CB_OPTIONS where optionId in
+		<foreach collection="optionArr" open="(" close=")" item="option" separator=",">
+			#{option}
+		</foreach>
+	</delete>
+	
+	<select id="getOptionById" parameterType="Integer" resultMap="optionResultMap">
+		select * from T_CB_OPTIONS where optionId = #{optionId} 
+	</select>
+	
+	<select id="getOptionByQuestionId" parameterType="Integer" resultType="Option">
+		select * from T_CB_OPTIONS where questionId = #{questionId} 
+	</select>
+</mapper>

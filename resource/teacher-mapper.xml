@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.TeacherMapper">
+
+	<sql id="whereSql" >
+		<if test="teacher.tName!=null and teacher.tName!=''">
+			<![CDATA[and tName like '%'+#{teacher.tName}+'%']]>
+		</if>
+		<if test="teacher.sex>0">
+			<![CDATA[and sex =#{teacher.sex}]]>
+		</if>
+		<if test="beginTeachingAge!=null and beginTeachingAge!=''">
+			<![CDATA[and teachingAge >=#{beginTeachingAge}]]>
+		</if>
+		<if test="endTeachingAge!=null and endTeachingAge!=''">
+			<![CDATA[and teachingAge <=#{endTeachingAge}]]>
+		</if>
+		<if test="teacher.tNo>0">
+			<![CDATA[and tNo =#{teacher.tNo}]]>
+		</if>	
+	</sql>
+
+	<select id="getTeachersByPage" parameterType="HashMap" resultMap="teacherResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as ttid,* from T_CB_TEACHER 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.ttid between #{begin} and #{end}
+	</select>
+	
+	<select id="getTeacherCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_TEACHER where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveTeacher" parameterType="Teacher" >
+		insert into T_CB_TEACHER (tName,sex,teachingAge,tNo,email,phone,address,createTime) 
+		values (#{tName},#{sex},#{teachingAge},#{tNo},#{email},#{phone},#{address},getdate())
+	</insert>
+	
+	<delete id="deleteTeacher" parameterType="Teacher">
+		delete from T_CB_TEACHER where tId = #{tId} 
+	</delete>
+	
+	<update id="updateTeacher" parameterType="Teacher">
+		update T_CB_TEACHER  set tName = #{tName} ,sex = #{sex} ,
+								 teachingAge = #{teachingAge} ,
+								 tNo = #{tNo} ,email = #{email} ,
+								 phone = #{phone} ,address = #{address} 
+		where tId = #{tId} 
+	</update>
+	
+	<delete id="batchDeleteTeacher" parameterType="int[]">
+		delete from T_CB_TEACHER where tId in
+		<foreach collection="teacherArr" open="(" close=")" item="teacher" separator=",">
+			#{teacher}
+		</foreach>
+	</delete>
+	
+	<select id="getTeacherById" parameterType="Integer" resultType="Teacher">
+		select * from T_CB_TEACHER where tId = #{tId} 
+	</select>
+	
+	<select id="getTeacherByUserSessionId" parameterType="String" resultType="Integer">
+		select tid from T_CB_TEACHER where tNo = #{userSessionId} 
+	</select>
+	
+	<select id="getTeacherEnrolList" parameterType="Integer" resultType="HashMap">
+		select * from  T_CB_NETWORKCOURSE where nwId in 
+		(
+			select nwId from T_CB_ENROL where type = 2 and fkId = (
+			select userId from T_CB_USERINFO where fkId = #{tId} and userType = 3)
+		)
+	</select>
+	
+	<select id="getTeacherResourceList" parameterType="Integer" resultType="Resource">
+		SELECT * FROM T_CB_RESOURCE where belongCourse = #{nwId}
+	</select>
+</mapper>

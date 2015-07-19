@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.ResourceMapper">
+	<resultMap type="Resource" id="resourceResultMap">
+		<id property="resourceId" column="resourceId" />
+		<result property="resourceName" column="resourceName"/>
+		<result property="resourcePath" column="resourcePath" />
+		<result property="resourceType" column="resourceType"/>
+		<result property="createTime" column="createTime"/>
+		<result property="courseName" column="CourseName"/>
+		<result property="belongCourse" column="belongCourse"/>
+	</resultMap>
+</mapper>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.TeacherMapper">
+	<resultMap type="Teacher" id="teacherResultMap">
+		<id property="tId" column="tId" />
+		<result property="tName" column="tName"/>
+		<result property="sex" column="sex" />
+		<result property="email" column="email"/>
+		<result property="address" column="address"/>
+		<result property="phone" column="phone"/>
+		<result property="teachingAge" column="teachingAge"/>
+		<result property="tNo" column="tNo"/>
+		<result property="createTime" column="createTime"/>
+	</resultMap>
+</mapper>

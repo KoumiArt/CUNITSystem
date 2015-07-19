@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.RecommendMapper">
+	
+	<sql id="whereSql" >
+		<if test="recommend.content!=null and recommend.content!=''">
+			<![CDATA[and content like '%'+#{recommend.content}+'%']]>
+		</if>	
+		<if test="recommend.recType>0">
+			and recType =#{recommend.recType}
+		</if>	
+	</sql>
+
+	<select id="getRecommendsByPage" parameterType="HashMap" resultMap="recommendResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by updateTime desc )as tid,* from T_CB_RECOMMEND 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getRecommendsByList" parameterType="HashMap" resultMap="recommendResultMap">
+		select * from T_CB_RECOMMEND 
+	</select>
+	
+	<select id="getRecommendCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_RECOMMEND where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveRecommend" parameterType="Recommend" >
+		insert into T_CB_RECOMMEND (content,recType
+		<if test="path !=null and path !=''">
+		,path
+		</if>
+		,createTime,updateTime)
+		values (#{content},#{recType}
+		<if test="path !=null and path !=''">
+		,#{path}
+		</if>
+		,getdate(),getdate())
+	</insert>
+	
+	<delete id="deleteRecommend" parameterType="Recommend">
+		delete from T_CB_RECOMMEND where recId = #{recId} 
+	</delete>
+	
+	<update id="updateRecommend" parameterType="Recommend">
+		update T_CB_RECOMMEND  set updateTime=getdate(), recType = #{recType}
+		<if test="content !=null and content !=''">
+		,content = #{content}
+		</if>
+		<if test="path !=null and path !=''">
+		,path = #{path}
+		</if>
+		where recId = #{recId} 
+	</update>
+	
+	<delete id="batchDeleteRecommend" parameterType="int[]">
+		delete from T_CB_RECOMMEND where recId in
+		<foreach collection="recommendArr" open="(" close=")" item="recommend" separator=",">
+			#{recommend}
+		</foreach>
+	</delete>
+	
+	<select id="getRecommendById" parameterType="Integer" resultMap="recommendResultMap">
+		select * from T_CB_RECOMMEND where recId = #{recId} 
+	</select>
+</mapper>

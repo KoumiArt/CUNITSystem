@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.EnrolMapper">
+	
+	<sql id="whereSql" >
+		<if test="enrol.type>0">
+			<![CDATA[and type = #{enrol.type} ]]>
+		</if>
+		<if test="enrol.fkId>0">
+			<![CDATA[and fkId = #{enrol.fkId} ]]>
+		</if>
+		<if test="enrol.nwId>0">
+			<![CDATA[and nwId = #{enrol.nwId} ]]>
+		</if>
+		<if test="enrol.sName !=null and enrol.sName !=''">
+		and fkId in (SELECT userId FROM T_CB_USERINFO 
+						where fkId in (
+							SELECT sId FROM T_CB_STUDENT WHERE sName like '%'+#{enrol.sName}+'%'
+						)
+					)
+		</if>
+	</sql>
+	
+	<insert id="saveEnrol" parameterType="Enrol" >
+		insert into T_CB_ENROL (fkId,nwId,createTime,type) 
+		values (#{fkId},#{nwId},getdate(),#{type})
+	</insert>
+	
+	<select id="getMyNetWorkCoursesByPage" parameterType="HashMap" resultMap="enrolResultMap2">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,*
+			from T_CB_ENROL
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getMyNetWorkCourseCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_ENROL where 1=1
+		<include refid="whereSql"/>	
+	</select>
+	
+	<select id="getQuestionRandom" parameterType="Integer" resultMap="com.cunitsystem.mapper.QuestionMapper.questionResultMap2">
+		select top 50 * from 	T_CB_QUESTIONS where nwId = #{nwId} order by NewID()
+	</select>
+</mapper>

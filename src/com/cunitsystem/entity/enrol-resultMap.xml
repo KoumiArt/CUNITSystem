@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.EnrolMapper">
+	<resultMap type="Enrol" id="enrolResultMap">
+		<id property="enrolId" column="enrolId" />
+		<result property="fkId" column="fkId"/>
+		<result property="nwId" column="nwId" />
+		<result property="type" column="type"/>
+		<result property="createTime" column="createTime"/>
+	</resultMap>
+	
+	<resultMap type="Enrol" id="enrolResultMap2">
+		<id property="enrolId" column="enrolId" />
+		<result property="fkId" column="fkId"/>
+		<result property="nwId" column="nwId" />
+		<result property="type" column="type"/>
+		<result property="score" column="score"/>
+		<result property="createTime" column="createTime"/>
+		<association property="userInfo" column="fkId" select="com.cunitsystem.mapper.UserMapper.getUserInfoById"></association>
+		<association property="netWorkCourse" column="nwId" select="com.cunitsystem.mapper.NetWorkCourseMapper.getNetWorkCourseById"></association>
+	</resultMap>
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.ExamMapper">
+	
+	<sql id="whereSql" >
+	</sql>
+
+	<select id="getExamsByPage" parameterType="HashMap" resultMap="examResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by endDate desc )as tid,* from T_CB_EXAM 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getExamCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_EXAM where 1=1
+		<include refid="whereSql"/>	
+	</select>
+
+	<insert id="saveExam" parameterType="Exam" >
+		insert into T_CB_EXAM (examName,nwId,endDate) 
+		values (#{examName},#{netWorkCourse.nwId},#{endDate})
+	</insert>
+	
+	<delete id="deleteExam" parameterType="Exam">
+		delete from T_CB_EXAM where examId = #{examId} 
+	</delete>
+	
+	<update id="updateExam" parameterType="Exam">
+		update T_CB_EXAM  set examName = #{examName},nwId = #{netWorkCourse.nwId} ,endDate = #{endDate}
+		where examId = #{examId} 
+	</update>
+	
+	<delete id="batchDeleteExam" parameterType="int[]">
+		delete from T_CB_EXAM where examId in
+		<foreach collection="examArr" open="(" close=")" item="exam" separator=",">
+			#{exam}
+		</foreach>
+	</delete>
+	
+	<select id="getExamById" parameterType="Integer" resultMap="examResultMap">
+		select * from T_CB_EXAM where examId = #{examId} 
+	</select>
+	
+</mapper>

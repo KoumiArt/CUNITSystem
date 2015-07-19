@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.ExamQuestionMapper">
+	
+	
+	<insert id="saveExamQuestion" parameterType="ExamQuestion" >
+		insert into T_CB_EXAM_QUESTION (examId,questionId,nwId) 
+		values (#{examId},#{questionId},#{nwId})
+	</insert>
+	
+	<select id="queryQuestionByNwId" parameterType="int" resultMap="com.cunitsystem.mapper.QuestionMapper.questionResultMap2">
+		SELECT * from T_CB_QUESTIONS where questionId in 
+		(
+			SELECT questionId FROM T_CB_EXAM_QUESTION e_q where nwId =#{nwId}
+			and examId = ( select examId FROM T_CB_EXAM e where  e_q.examId = e.examId and endDate >= GETDATE())
+		)
+	</select>
+	<select id="queryQuestionIdList" parameterType="java.util.HashMap" resultType="Integer">
+		SELECT questionId FROM T_CB_EXAM_QUESTION where examId = #{examId} and nwId= #{nwId}
+	</select>
+</mapper>

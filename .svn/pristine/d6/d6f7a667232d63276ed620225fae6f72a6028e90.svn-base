@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.QuestionMapper">
+	<resultMap type="Question" id="questionResultMap">
+		<id property="questionId" column="questionID" />
+		<result property="content" column="content"/>
+		<result property="description" column="description"/>
+		<result property="createTime" column="createTime"/>
+		<result property="score" column="Score"/>
+		<association property="netWorkCourse" column="nwId" select="com.cunitsystem.mapper.NetWorkCourseMapper.getNetWorkCourseById"/>
+	</resultMap>
+	
+	<resultMap type="Question" id="questionResultMap2">
+		<id property="questionId" column="questionID" />
+		<result property="content" column="content"/>
+		<result property="createTime" column="createTime"/>
+		<result property="description" column="description"/>
+		<result property="score" column="Score"/>
+		<collection property="optionList" column="questionId" select="com.cunitsystem.mapper.OptionMapper.getOptionByQuestionId"></collection>
+	</resultMap>
+</mapper>

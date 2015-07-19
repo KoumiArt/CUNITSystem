@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.HomeWorkCommentMapper">
+
+	<insert id="saveHomeWorkComment" parameterType="HomeWorkComment" >
+		insert into T_CB_HOMEWORK_COMMENTS (nwId,stuId,isEligible,date)
+		values (#{nwId},#{stuId},#{isEligible},GETDATE())
+	</insert>
+	
+	<select id="queryDateCommentCount" parameterType="java.util.HashMap" resultType="int">
+		<![CDATA[
+			select count(*) from T_CB_HOMEWORK_COMMENTS
+		 where nwId =#{nwId} and stuId =#{stuId} and 
+			date >= #{startTime} and  date <= #{endTime}
+		]]>
+	</select>
+
+</mapper>

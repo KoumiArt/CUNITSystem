@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.NetWorkCourseMapper">
+	<resultMap type="NetWorkCourse" id="netWorkCourseResultMap">
+		<id property="nwId" column="nwId" />
+		<result property="courseName" column="courseName"/>
+		<result property="createTime" column="createTime"/>
+		<result property="description" column="description" />
+	</resultMap>
+</mapper>

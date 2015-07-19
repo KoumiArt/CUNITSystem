@@ -1,0 +1,4 @@
+#Thu May 08 03:42:58 CST 2014
+eclipse.preferences.version=1
+validator.Checked=WebRoot/jquery-easyui-1.3.5,WebRoot/jsp/client/files,WebRoot/jsp/login.jsp,WebRoot/jquery-easyui-1.2.3,WebRoot/jsp/manager,WebRoot/jsp/errors/files,WebRoot/js
+validator.Unchecked=

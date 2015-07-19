@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cunitsystem.mapper.HomeWorkLogMapper">
+	<resultMap type="HomeWorkLog" id="homeWorkLogResultMap">
+		<id property="hwLogId" column="hwLogId" />
+		<result property="stuId" column="stuId"/>
+		<result property="nwId" column="nwId" />
+		<result property="subTime" column="subTime"/>
+	</resultMap>
+</mapper>

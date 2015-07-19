@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.GradeMapper">
+
+	<sql id="whereSql">
+		<if test="grade.gradeName != null and !''.equals(grade.gradeName)">
+			<![CDATA[and gradeName like '%'+#{grade.gradeName}+'%']]>
+		</if>
+	</sql>
+
+	<select id="getGradeByPage" parameterType="HashMap" resultMap="gradeResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,* from T_CB_GRADE 
+			where 1=1 	
+			<include refid="whereSql"/>	
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getGradeCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from T_CB_GRADE where 1=1
+		<include refid="whereSql"/>	
+	</select>
+	
+	<select id="getGradeById" parameterType="Integer" resultType="Grade">
+		select * from T_CB_GRADE where gradeId = #{gradeId} 
+	</select>
+</mapper>

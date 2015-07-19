@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+ 
+    <!-- 别名 -->
+    <typeAliases>
+        <typeAlias type="com.cunitsystem.entity.UserInfo" alias="UserInfo"/>
+        <typeAlias type="com.cunitsystem.entity.Menu" alias="Menu"/>
+        <typeAlias type="com.cunitsystem.entity.Resource" alias="Resource"/>
+        <typeAlias type="com.cunitsystem.entity.Student" alias="Student"/>
+        <typeAlias type="com.cunitsystem.entity.Teacher" alias="Teacher"/>
+        <typeAlias type="com.cunitsystem.entity.Grade" alias="Grade"/>
+        <typeAlias type="com.cunitsystem.entity.Subject" alias="Subject"/>
+        <typeAlias type="com.cunitsystem.entity.Question" alias="Question"/>
+        <typeAlias type="com.cunitsystem.entity.Option" alias="Option"/>
+        <typeAlias type="com.cunitsystem.entity.Recommend" alias="Recommend"/>
+        <typeAlias type="com.cunitsystem.entity.NetWorkCourse" alias="NetWorkCourse"/>
+        <typeAlias type="com.cunitsystem.entity.Enrol" alias="Enrol"/>
+        <typeAlias type="com.cunitsystem.entity.HomeWork" alias="HomeWork"/>
+        <typeAlias type="com.cunitsystem.entity.StuHomeWork" alias="StuHomeWork"/>
+        <typeAlias type="com.cunitsystem.entity.HomeWorkLog" alias="HomeWorkLog"/>
+        <typeAlias type="com.cunitsystem.entity.HomeWorkComment" alias="HomeWorkComment"/>
+        <typeAlias type="com.cunitsystem.entity.Exam" alias="Exam"/>
+        <typeAlias type="com.cunitsystem.entity.ExamQuestion" alias="ExamQuestion"/>
+        <typeAlias type="com.cunitsystem.entity.StuExam" alias="StuExam"/>
+    </typeAliases>
+    
+</configuration>

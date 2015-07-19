@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="com.cunitsystem.mapper.ResourceMapper">
+	<sql id="whereSql" >
+		<if test="resourceType>0">
+			<![CDATA[and resourceType = #{resourceType} ]]>
+		</if>
+		<if test="resourceName!=null and resourceName!=''">
+			<![CDATA[and resourceName 
+			like '%'+#{resourceName}+'%']]>
+		</if>
+		<if test="beginTime!=null and beginTime!=''">
+			<![CDATA[and createTime >=#{beginTime}]]>
+		</if>
+		<if test="endTime!=null and endTime!=''">
+			<![CDATA[and createTime <=#{endTime}]]>
+		</if>		
+	</sql>
+
+	<select id="getResourceByPage" parameterType="HashMap" resultMap="resourceResultMap">
+		select * from 	
+		(
+		select ROW_NUMBER() OVER(order by createTime desc )as tid,*,(select CourseName from T_CB_NETWORKCOURSE n where n.nwId = r.belongCourse) as courseName from T_CB_RESOURCE  r
+			where 1=1 
+			<include refid="whereSql"/>
+		) as a 
+		where a.tid between #{begin} and #{end}
+	</select>
+	
+	<select id="getResourceCount" parameterType="HashMap" resultType="Integer">
+		select count(*) from 	T_CB_RESOURCE where 1=1 
+		<include refid="whereSql"/>
+	</select>
+
+	<insert id="saveResource" parameterType="Resource" >
+		insert into T_CB_RESOURCE (resourceName,resourcePath,resourceType,createTime,belongCourse) 
+		values (#{resourceName},#{resourcePath},#{resourceType},getdate(),#{belongCourse})
+	</insert>
+	
+	<delete id="deleteResource" parameterType="Resource">
+		delete from T_CB_RESOURCE where resourceId = #{resourceId} 
+	</delete>
+	
+	<update id="updateResource" parameterType="Resource">
+		update T_CB_RESOURCE  set resourceName = #{resourceName} ,resourceType = #{resourceType},  resourcePath = #{resourcePath} ,belongCourse = #{belongCourse} where resourceId = #{resourceId} 
+	</update>
+	
+	<delete id="batchDeleteResource" parameterType="int[]">
+		delete from T_CB_RESOURCE where resourceId in
+		<foreach collection="resourceArr" open="(" close=")" item="resource" separator=",">
+			#{resource}
+		</foreach>
+	</delete>
+	
+	<select id="getResourceById" parameterType="Integer" resultType="Resource">
+		select * from T_CB_RESOURCE where resourceId = #{resourceId} 
+	</select>
+</mapper>
